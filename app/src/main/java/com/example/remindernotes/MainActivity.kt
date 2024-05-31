@@ -1,46 +1,40 @@
 package com.example.remindernotes
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.compose.rememberNavController
+import com.example.remindernotes.data.DatabaseProvider
+import com.example.remindernotes.ui.NavGraph
 import com.example.remindernotes.ui.theme.ReminderNotesTheme
+import com.example.remindernotes.viewmodel.TaskViewModel
+import com.example.remindernotes.viewmodel.TaskViewModelFactory
 
 class MainActivity : ComponentActivity() {
+    @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
-        setContent {
-            ReminderNotesTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
-                }
+
+        val taskDao = DatabaseProvider.getDatabase(this).taskDao()
+        val taskViewModel = ViewModelProvider(this, TaskViewModelFactory(taskDao)).get(TaskViewModel::class.java)
+
+
+        setContent { ReminderNotesTheme {
+            Surface(color=MaterialTheme.colorScheme.background) {
+                val navController = rememberNavController()
+                NavGraph(navController=navController, taskViewModel=taskViewModel)
+
             }
+
+
+        }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ReminderNotesTheme {
-        Greeting("Android")
-    }
-}
