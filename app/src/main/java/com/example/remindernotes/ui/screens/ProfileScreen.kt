@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -18,12 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import com.example.remindernotes.ui.theme.ReminderNotesTheme
+import androidx.compose.runtime.MutableState
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController) {
-    val isDarkTheme = remember { mutableStateOf(false) }
+fun ProfileScreen(navController: NavController, isDarkTheme: MutableState<Boolean>) {
+
 
     ReminderNotesTheme(darkTheme = isDarkTheme.value) {
         Column(
@@ -59,7 +59,7 @@ fun ProfileScreen(navController: NavController) {
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(text = "This is some text in the middle of the screen")
+                            Text(text = "This is some text in the middle of the screenddd")
                         }
                     }
                 )
