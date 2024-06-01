@@ -155,7 +155,7 @@ fun BottomNavigationBar(navController: NavController) {
 }
 
 sealed class BottomNavItem(val title: String, val icon: ImageVector, val route: String) {
-    object Home : BottomNavItem("Home", Icons.Filled.Home, Screen.TaskList.route)
-    object Calendar : BottomNavItem("Calendar", Icons.Filled.DateRange, Screen.TaskDetail.route)
+    object Home : BottomNavItem("Home", Icons.Filled.Home, Screen.Home.route)
+    object Calendar : BottomNavItem("Calendar", Icons.Filled.DateRange, Screen.TaskList.route)
     object Profile : BottomNavItem("Profile", Icons.Filled.Person, Screen.Profile.route)
 }
