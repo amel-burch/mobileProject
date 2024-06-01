@@ -42,6 +42,8 @@ import com.example.remindernotes.utils.toCustomString
 import com.example.remindernotes.viewmodel.TaskViewModel
 import java.time.LocalDate
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
@@ -50,6 +52,9 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import com.example.remindernotes.ui.theme.ReminderNotesTheme
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -73,7 +78,7 @@ fun TaskListScreen(navController: NavController, taskViewModel: TaskViewModel, i
                 modifier = Modifier.padding(innerPadding)
             ) {
                 items(taskViewModel.tasks) { task ->
-                    TaskItem(task = task)
+                    TaskItem(task = task, navController, taskViewModel)
                 }
             }
         }
@@ -81,13 +86,14 @@ fun TaskListScreen(navController: NavController, taskViewModel: TaskViewModel, i
 }
 
 @Composable
-fun TaskItem(task: Task) {
+fun TaskItem(task: Task, navController: NavController, taskViewModel: TaskViewModel) {
+    var showMenu by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .padding(horizontal = 8.dp)
-            .clickable { }
+            .clickable { showMenu = true }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically){
@@ -107,13 +113,30 @@ fun TaskItem(task: Task) {
                 Text(text = task.dueTime.format(DateTimeFormatter.ofPattern("HH:mm")), fontSize = 18.sp)
             }
         }
+        DropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { showMenu = false }
+        ) {
+            DropdownMenuItem(text = {
+                Text("Edit")
+            },onClick = {
+                showMenu = false
+                navController.navigate("task_edit/${task.id}")
+            })
+            DropdownMenuItem(text = {
+                Text("Delete")
+            },onClick = {
+                showMenu = false
+                taskViewModel.deleteTask(task)
+            })
+        }
     }
 }
 
 @Preview
 @Composable
 fun TaskPreview(){
-    TaskItem(task = Task(0, "Title1", "Description text", LocalDate.now(), LocalTime.now()))
+    //TaskItem(task = Task(0, "Title1", "Description text", LocalDate.now(), LocalTime.now()))
 }
 
 @Composable

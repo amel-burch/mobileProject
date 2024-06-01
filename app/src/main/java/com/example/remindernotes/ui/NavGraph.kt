@@ -10,6 +10,7 @@ import com.example.remindernotes.ui.screens.ProfileScreen
 import com.example.remindernotes.viewmodel.TaskViewModel
 import androidx.compose.runtime.MutableState
 import com.example.remindernotes.ui.screens.HomeScreen
+import com.example.remindernotes.ui.screens.TaskEditScreen
 
 sealed class Screen(val route: String) {
 
@@ -18,6 +19,7 @@ sealed class Screen(val route: String) {
     object TaskDetail : Screen("task_detail")
     object Calendar : Screen("calendar")
     object Profile : Screen("profile")
+    object TaskEdit : Screen("task_edit")
 }
 
 @Composable
@@ -34,6 +36,10 @@ fun NavGraph(navController: NavHostController, taskViewModel: TaskViewModel, isD
         }
         composable(Screen.Home.route) {
             HomeScreen(navController, isDarkTheme)
+        }
+        composable("task_edit/{taskId}") { backStackEntry ->
+            val taskId = backStackEntry.arguments?.getString("taskId")
+            TaskEditScreen(navController, taskViewModel, isDarkTheme, taskId)
         }
     }
 }
