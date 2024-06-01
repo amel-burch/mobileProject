@@ -64,6 +64,7 @@ dependencies {
 
 
     implementation("androidx.navigation:navigation-compose:2.6.0")
+    implementation ("com.google.accompanist:accompanist-flowlayout:0.26.3-beta") // Update to the latest version
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
