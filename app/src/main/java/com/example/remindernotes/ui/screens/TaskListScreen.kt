@@ -41,7 +41,7 @@ import com.example.remindernotes.ui.Screen
 import com.example.remindernotes.utils.toCustomString
 import com.example.remindernotes.viewmodel.TaskViewModel
 import java.time.LocalDate
-
+import androidx.compose.foundation.layout.*
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 
@@ -55,7 +55,8 @@ fun TaskListScreen(navController: NavController, taskViewModel: TaskViewModel) {
             }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Task")
             }
-        }
+        },
+        bottomBar = { BottomNavigationBar(navController) }
     ) { innerPadding ->
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
