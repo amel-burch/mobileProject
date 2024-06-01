@@ -3,6 +3,7 @@ package com.example.remindernotes.data
 import androidx.room.Entity
 
 import androidx.room.PrimaryKey
+import java.time.LocalDate
 
 @Entity(tableName = "tasks")
 
@@ -12,5 +13,7 @@ data class Task(
 
     val title: String,
 
-    val description: String
+    val description: String,
+
+    val dueDate: LocalDate
 )
