@@ -42,28 +42,39 @@ import com.example.remindernotes.utils.toCustomString
 import com.example.remindernotes.viewmodel.TaskViewModel
 import java.time.LocalDate
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import com.example.remindernotes.ui.theme.ReminderNotesTheme
+import androidx.compose.runtime.MutableState
+
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 
 @Composable
-fun TaskListScreen(navController: NavController, taskViewModel: TaskViewModel) {
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Tasks") }) },
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                navController.navigate("task_detail")
-            }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Task")
-            }
-        },
-        bottomBar = { BottomNavigationBar(navController) }
-    ) { innerPadding ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            items(taskViewModel.tasks) { task ->
-                TaskItem(task = task)
+fun TaskListScreen(navController: NavController, taskViewModel: TaskViewModel, isDarkTheme: MutableState<Boolean>) {
+    ReminderNotesTheme(darkTheme = isDarkTheme.value){
+        Scaffold(
+            topBar = { TopAppBar(title = { Text("Tasks") }) },
+            floatingActionButton = {
+                FloatingActionButton(onClick = {
+                    navController.navigate("task_detail")
+                }) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add Task")
+                }
+            },
+            bottomBar = { BottomNavigationBar(navController) }
+        ) { innerPadding ->
+            LazyColumn(
+                //columns = GridCells.Fixed(2),
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                items(taskViewModel.tasks) { task ->
+                    TaskItem(task = task)
+                }
             }
         }
     }
@@ -79,11 +90,22 @@ fun TaskItem(task: Task) {
             .clickable { }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = task.title, style = MaterialTheme.typography.headlineMedium)
-            Spacer(modifier = Modifier.height(4.dp))
+            Row(verticalAlignment = Alignment.CenterVertically){
+                Text(text = task.title, style = MaterialTheme.typography.headlineMedium)
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(
+                    imageVector = Icons.Default.Home,
+                    contentDescription = "",
+                    modifier = Modifier.scale(1.2F))
+            }
+            Spacer(modifier = Modifier.height(16.dp))
             Text(text = task.description, style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(32.dp))
-            Text(text = task.dueDate.toCustomString())
+            Row (verticalAlignment = Alignment.CenterVertically) {
+                Text(text = task.dueDate.toCustomString(), fontSize = 18.sp, fontWeight = FontWeight.Light)
+                Spacer(modifier = Modifier.weight(1f))
+                Text(text = task.dueTime.format(DateTimeFormatter.ofPattern("HH:mm")), fontSize = 18.sp)
+            }
         }
     }
 }
@@ -91,7 +113,7 @@ fun TaskItem(task: Task) {
 @Preview
 @Composable
 fun TaskPreview(){
-    TaskItem(task = Task(0, "Title1", "Description text", LocalDate.now()))
+    TaskItem(task = Task(0, "Title1", "Description text", LocalDate.now(), LocalTime.now()))
 }
 
 @Composable
