@@ -42,6 +42,9 @@ import com.example.remindernotes.utils.toCustomString
 import com.example.remindernotes.viewmodel.TaskViewModel
 import java.time.LocalDate
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.Alignment
@@ -55,15 +58,63 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 
 @Composable
 fun TaskListScreen(navController: NavController, taskViewModel: TaskViewModel, isDarkTheme: MutableState<Boolean>) {
+    var currentYearMonth by remember { mutableStateOf(YearMonth.now()) }
+
+    val tasksForCurrentMonth = taskViewModel.tasks.filter {
+        it.dueDate.year == currentYearMonth.year && it.dueDate.monthValue == currentYearMonth.monthValue
+    }
+
+
     ReminderNotesTheme(darkTheme = isDarkTheme.value){
         Scaffold(
-            topBar = { TopAppBar(title = { Text("Tasks") }) },
+            topBar = {
+                Column {
+                    TopAppBar(
+                        title = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                val previousMonth = currentYearMonth.minusMonths(1)
+                                val nextMonth = currentYearMonth.plusMonths(1)
+
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    IconButton(onClick = {
+                                        currentYearMonth = previousMonth
+                                    }) {
+                                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Previous Month")
+                                    }
+                                    Text(text = previousMonth.format(DateTimeFormatter.ofPattern("MMM")), style = MaterialTheme.typography.bodySmall)
+                                }
+
+                                Text(
+                                    text = currentYearMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")),
+                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                                )
+
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    IconButton(onClick = {
+                                        currentYearMonth = nextMonth
+                                    }) {
+                                        Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "Next Month")
+                                    }
+                                    Text(text = nextMonth.format(DateTimeFormatter.ofPattern("MMM")), style = MaterialTheme.typography.bodySmall)
+                                }
+                            }
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color = Color.Gray, thickness = 1.dp) // Adding Divider here
+                }
+            },
             floatingActionButton = {
                 FloatingActionButton(onClick = {
                     navController.navigate("task_detail")
@@ -77,7 +128,7 @@ fun TaskListScreen(navController: NavController, taskViewModel: TaskViewModel, i
                 //columns = GridCells.Fixed(2),
                 modifier = Modifier.padding(innerPadding)
             ) {
-                items(taskViewModel.tasks) { task ->
+                items(tasksForCurrentMonth) { task ->
                     TaskItem(task = task, navController, taskViewModel)
                 }
             }
