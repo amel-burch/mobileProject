@@ -23,4 +23,19 @@ class TaskViewModel(private val taskDao: TaskDao): ViewModel(){
             tasks.add(task)
         }
     }
+    fun editTask(task: Task) {
+        viewModelScope.launch {
+            taskDao.updateTask(task)
+            val index = tasks.indexOfFirst { it.id == task.id }
+            if (index != -1) {
+                tasks[index] = task
+            }
+        }
+    }
+    fun deleteTask(task: Task) {
+        viewModelScope.launch {
+            taskDao.deleteTask(task)
+            tasks.remove(task)
+        }
+    }
 }
