@@ -4,7 +4,9 @@ package com.example.remindernotes.ui.screens
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -23,11 +25,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.remindernotes.data.Task
 import com.example.remindernotes.ui.Screen
+import com.example.remindernotes.utils.toCustomString
 import com.example.remindernotes.viewmodel.TaskViewModel
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -66,7 +71,16 @@ fun TaskItem(task: Task) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = task.title, style = MaterialTheme.typography.headlineMedium)
+            Spacer(modifier = Modifier.height(4.dp))
             Text(text = task.description, style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(32.dp))
+            Text(text = task.dueDate.toCustomString())
         }
     }
+}
+
+@Preview
+@Composable
+fun TaskPreview(){
+    TaskItem(task = Task(0, "Title1", "Description text", LocalDate.now()))
 }
