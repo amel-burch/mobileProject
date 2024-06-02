@@ -18,5 +18,6 @@ data class Task(
 
     val dueDate: LocalDate,
 
-    val dueTime: LocalTime
+    val dueTime: LocalTime,
+    val userId: Int
 )

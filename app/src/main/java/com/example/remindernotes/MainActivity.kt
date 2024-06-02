@@ -18,6 +18,9 @@ import com.example.remindernotes.viewmodel.TaskViewModel
 import com.example.remindernotes.viewmodel.TaskViewModelFactory
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import com.example.remindernotes.data.UserPreferences
+import com.example.remindernotes.viewmodel.UserViewModel
+import com.example.remindernotes.viewmodel.UserViewModelFactory
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("SuspiciousIndentation")
@@ -25,19 +28,26 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val taskDao = DatabaseProvider.getDatabase(this).taskDao()
-        val taskViewModel = ViewModelProvider(this, TaskViewModelFactory(taskDao)).get(TaskViewModel::class.java)
+        val userDao = DatabaseProvider.getDatabase(this).userDao()
+        val userPreferences = UserPreferences(this)
+        val taskViewModel = ViewModelProvider(this, TaskViewModelFactory(taskDao, userDao)).get(TaskViewModel::class.java)
+        val userViewModel = ViewModelProvider(this, UserViewModelFactory(userDao, userPreferences)).get(UserViewModel::class.java)
 
         setContent {
             val isDarkTheme = remember { mutableStateOf(false) }
-            MainContent(rememberNavController(), taskViewModel, isDarkTheme)
+            MainContent(rememberNavController(), taskViewModel, userViewModel,isDarkTheme)
         }
     }
 
     @Composable
-    fun MainContent(navController: NavHostController, taskViewModel: TaskViewModel, isDarkTheme: MutableState<Boolean>) {
+    fun MainContent(
+        navController: NavHostController,
+        taskViewModel: TaskViewModel,
+        userViewModel: UserViewModel,
+        isDarkTheme: MutableState<Boolean>) {
         ReminderNotesTheme(darkTheme = isDarkTheme.value) {
             Surface(color=MaterialTheme.colorScheme.background) {
-                NavGraph(navController=navController, taskViewModel=taskViewModel, isDarkTheme = isDarkTheme)
+                NavGraph(navController, taskViewModel, userViewModel, isDarkTheme)
             }
         }
     }
