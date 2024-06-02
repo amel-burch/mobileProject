@@ -17,4 +17,6 @@ interface TaskDao {
     suspend fun deleteTask(task: Task)
     @Update
     suspend fun updateTask(task: Task)
+    @Query("SELECT * FROM tasks WHERE userId = :userId")
+    suspend fun getTasksForUser(userId: Int): List<Task>
 }

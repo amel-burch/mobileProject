@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.remindernotes.data.Task
 import com.example.remindernotes.data.TaskDao
+import com.example.remindernotes.data.UserDao
 import kotlinx.coroutines.launch
+import java.time.YearMonth
 
-class TaskViewModel(private val taskDao: TaskDao): ViewModel(){
+class TaskViewModel(private val taskDao: TaskDao, private val userDao: UserDao): ViewModel(){
     val tasks = mutableStateListOf<Task>()
 
     init {
@@ -36,6 +38,15 @@ class TaskViewModel(private val taskDao: TaskDao): ViewModel(){
         viewModelScope.launch {
             taskDao.deleteTask(task)
             tasks.remove(task)
+        }
+    }
+    suspend fun getTasksForUser(userId: Int): List<Task> {
+        return taskDao.getTasksForUser(userId)
+    }
+    suspend fun getTasksForUserByMonth(userId: Int, yearMonth: YearMonth): List<Task> {
+        val tasksForUser = taskDao.getTasksForUser(userId)
+        return tasksForUser.filter {
+            it.dueDate.year == yearMonth.year && it.dueDate.monthValue == yearMonth.monthValue
         }
     }
 }

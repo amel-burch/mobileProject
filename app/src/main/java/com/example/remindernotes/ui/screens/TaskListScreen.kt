@@ -44,9 +44,12 @@ import java.time.LocalDate
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
@@ -55,83 +58,171 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import com.example.remindernotes.ui.theme.ReminderNotesTheme
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import com.example.remindernotes.viewmodel.UserViewModel
 import java.time.YearMonth
+import com.example.remindernotes.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 
 @Composable
-fun TaskListScreen(navController: NavController, taskViewModel: TaskViewModel, isDarkTheme: MutableState<Boolean>) {
+fun TaskListScreen(navController: NavController, taskViewModel: TaskViewModel, userViewModel: UserViewModel, isDarkTheme: MutableState<Boolean>) {
     var currentYearMonth by remember { mutableStateOf(YearMonth.now()) }
 
-    val tasksForCurrentMonth = taskViewModel.tasks.filter {
-        it.dueDate.year == currentYearMonth.year && it.dueDate.monthValue == currentYearMonth.monthValue
+    val user by userViewModel.loggedInUser.collectAsState()
+    var tasksForCurrentMonth by remember { mutableStateOf(emptyList<Task>()) }
+
+    LaunchedEffect(user, currentYearMonth) {
+        user?.let {
+            tasksForCurrentMonth = taskViewModel.getTasksForUserByMonth(it.id, currentYearMonth)
+        }
     }
 
 
+
+
     ReminderNotesTheme(darkTheme = isDarkTheme.value){
-        Scaffold(
-            topBar = {
-                Column {
-                    TopAppBar(
-                        title = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                val previousMonth = currentYearMonth.minusMonths(1)
-                                val nextMonth = currentYearMonth.plusMonths(1)
+        if(user!=null){
+            Scaffold(
+                topBar = {
+                    Column {
+                        TopAppBar(
+                            modifier = Modifier.padding(top = 12.dp),
+                            title = {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    val previousMonth = currentYearMonth.minusMonths(1)
+                                    val nextMonth = currentYearMonth.plusMonths(1)
 
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    IconButton(onClick = {
-                                        currentYearMonth = previousMonth
-                                    }) {
-                                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Previous Month")
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        IconButton(onClick = {
+                                            currentYearMonth = previousMonth
+                                        }) {
+                                            Icon(
+                                                imageVector = Icons.Default.ArrowBack,
+                                                contentDescription = "Previous Month"
+                                            )
+                                        }
+                                        Text(
+                                            text = previousMonth.format(
+                                                DateTimeFormatter.ofPattern(
+                                                    "MMM"
+                                                )
+                                            ), style = MaterialTheme.typography.bodySmall
+                                        )
                                     }
-                                    Text(text = previousMonth.format(DateTimeFormatter.ofPattern("MMM")), style = MaterialTheme.typography.bodySmall)
-                                }
 
-                                Text(
-                                    text = currentYearMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")),
-                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                                )
+                                    Text(
+                                        text = currentYearMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")),
+                                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                                    )
 
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    IconButton(onClick = {
-                                        currentYearMonth = nextMonth
-                                    }) {
-                                        Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "Next Month")
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        IconButton(onClick = {
+                                            currentYearMonth = nextMonth
+                                        }) {
+                                            Icon(
+                                                imageVector = Icons.Default.ArrowForward,
+                                                contentDescription = "Next Month"
+                                            )
+                                        }
+                                        Text(
+                                            text = nextMonth.format(DateTimeFormatter.ofPattern("MMM")),
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
                                     }
-                                    Text(text = nextMonth.format(DateTimeFormatter.ofPattern("MMM")), style = MaterialTheme.typography.bodySmall)
                                 }
                             }
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Divider(color = Color.Gray, thickness = 1.dp) // Adding Divider here
-                }
-            },
-            floatingActionButton = {
-                FloatingActionButton(onClick = {
-                    navController.navigate("task_detail")
-                }) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add Task")
-                }
-            },
-            bottomBar = { BottomNavigationBar(navController) }
-        ) { innerPadding ->
-            LazyColumn(
-                //columns = GridCells.Fixed(2),
-                modifier = Modifier.padding(innerPadding)
-            ) {
-                items(tasksForCurrentMonth) { task ->
-                    TaskItem(task = task, navController, taskViewModel)
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Divider(color = Color.Gray, thickness = 1.dp) // Adding Divider here
+                    }
+                },
+                floatingActionButton = {
+                    FloatingActionButton(onClick = {
+                        navController.navigate("task_detail")
+                    }) {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "Add Task")
+                    }
+                },
+                bottomBar = { BottomNavigationBar(navController) }
+            ) { innerPadding ->
+                LazyColumn(
+                    //columns = GridCells.Fixed(2),
+                    modifier = Modifier.padding(innerPadding)
+                ) {
+                    items(tasksForCurrentMonth) { task ->
+                        TaskItem(task = task, navController, taskViewModel)
+                    }
                 }
             }
+        }else {
+            Scaffold(
+                content={
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = "You are not logged in", fontSize = 24.sp)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = "Login or create an account to add tasks", fontWeight = FontWeight.Light)
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Divider(
+                            thickness = 2.dp,
+                            modifier = Modifier.width(250.dp),
+                            color = colorResource(id = R.color.defaultBlue))
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Row(){
+                            Button(onClick = { navController.navigate("login") },
+                                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.defaultBlue))) {
+                                Text("Register")
+                            }
+                            Spacer(modifier = Modifier.width(24.dp))
+                            Button(
+                                onClick = { navController.navigate("login") },
+                                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.defaultBlue))) {
+                                Text("Login")
+                            }
+                        }
+                    }
+                },
+                bottomBar = { BottomNavigationBar(navController) }
+            )
+        }
+    }
+}
+
+@Composable
+fun SmallTaskItem(task: Task, navController: NavController, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .padding(vertical = 8.dp)
+            .padding(horizontal = 8.dp)
+            .fillMaxWidth()
+            .clickable { navController.navigate("task_list") } // Add this line
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(imageVector = Icons.Default.Home, contentDescription = task.title)
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(text = task.title, style = MaterialTheme.typography.headlineMedium)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Due Date: ${task.dueDate.toCustomString()}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Due Time: ${task.dueTime.format(DateTimeFormatter.ofPattern("HH:mm"))}", style = MaterialTheme.typography.bodySmall)
         }
     }
 }

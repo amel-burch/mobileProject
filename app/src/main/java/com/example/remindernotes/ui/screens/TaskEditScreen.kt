@@ -40,6 +40,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
+import com.example.remindernotes.viewmodel.UserViewModel
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -154,7 +155,8 @@ fun TaskEditScreen(navController: NavController, taskViewModel: TaskViewModel, i
                                     title = title,
                                     description = description,
                                     dueDate = dueDate,
-                                    dueTime = dueTime
+                                    dueTime = dueTime,
+                                    userId = it.userId
                                 )
                                 taskViewModel.editTask(updatedTask)
                             }

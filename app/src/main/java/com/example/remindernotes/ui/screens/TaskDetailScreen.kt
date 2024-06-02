@@ -37,20 +37,23 @@ import android.text.format.DateFormat
 import androidx.compose.material.icons.filled.Create
 import com.example.remindernotes.ui.theme.ReminderNotesTheme
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
+import com.example.remindernotes.viewmodel.UserViewModel
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskDetailScreen(navController: NavController, taskViewModel: TaskViewModel, isDarkTheme: MutableState<Boolean>) {
+fun TaskDetailScreen(navController: NavController, taskViewModel: TaskViewModel, userViewModel: UserViewModel, isDarkTheme: MutableState<Boolean>) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var dueDate by remember { mutableStateOf(LocalDate.now())}
     var dueTime by remember { mutableStateOf(LocalTime.now())}
     val context = LocalContext.current
+    val user by userViewModel.loggedInUser.collectAsState()
 
     fun showDatePicker() {
         val now = Calendar.getInstance()
@@ -152,7 +155,8 @@ fun TaskDetailScreen(navController: NavController, taskViewModel: TaskViewModel,
                                     title = title,
                                     description = description,
                                     dueDate = dueDate,
-                                    dueTime = dueTime
+                                    dueTime = dueTime,
+                                    userId = user?.id ?: 12345
                                 )
                             )
                             navController.popBackStack()
