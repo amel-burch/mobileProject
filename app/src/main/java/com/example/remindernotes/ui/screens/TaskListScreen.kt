@@ -182,7 +182,7 @@ fun TaskListScreen(navController: NavController, taskViewModel: TaskViewModel, u
                             color = colorResource(id = R.color.defaultBlue))
                         Spacer(modifier = Modifier.height(24.dp))
                         Row(){
-                            Button(onClick = { navController.navigate("login") },
+                            Button(onClick = { navController.navigate("register") },
                                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.defaultBlue))) {
                                 Text("Register")
                             }
