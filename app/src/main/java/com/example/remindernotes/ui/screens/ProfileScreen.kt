@@ -102,7 +102,7 @@ fun ProfileScreen(userViewModel: UserViewModel, navController: NavController, is
                                 )
                                 Spacer(modifier = Modifier.height(24.dp))
                                 Row(){
-                                    Button(onClick = { navController.navigate("login") },
+                                    Button(onClick = { navController.navigate("register") },
                                         colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.defaultBlue))) {
                                         Text("Register")
                                     }
